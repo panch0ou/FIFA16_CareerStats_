@@ -13,10 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'runtime'))
 import layout
 from build_payload import compile_helpers, rust_environment
-from version import DISPLAY_VERSION, VERSION
 
 BUILD = ROOT/'.local/build'
-OUTPUT = ROOT/f'Release_v{VERSION}'
+OUTPUT = ROOT/'release'
 USER_ZIP = OUTPUT/'FIFA16_CareerStats_User_Release.zip'
 SOURCE_ZIP = OUTPUT/'FIFA16_CareerStats_Source_Code.zip'
 DATA_NAMES = ('historial_ampliado.sqlite', 'club_records.json')
@@ -67,24 +66,8 @@ def build_user():
 
     helpers = BUILD/'helpers'
     compile_helpers(helpers)
-    version_file = BUILD/'windows-version.txt'
-    windows_version = tuple(map(int, VERSION.split('.'))) + (0,)
-    version_file.write_text(
-        f"""VSVersionInfo(
-    ffi=FixedFileInfo(filevers={windows_version!r}, prodvers={windows_version!r},
-                      mask=0x3f, flags=2, OS=0x40004, fileType=1, subtype=0, date=(0, 0)),
-    kids=[StringFileInfo([StringTable('040904B0', [
-        StringStruct('FileDescription', 'FIFA 16 Career Stats'),
-        StringStruct('FileVersion', {VERSION!r}),
-        StringStruct('ProductName', 'FIFA 16 Career Stats'),
-        StringStruct('ProductVersion', {DISPLAY_VERSION!r}),
-        StringStruct('OriginalFilename', 'CareerStats.exe'),
-    ])]), VarFileInfo([VarStruct('Translation', [1033, 1200])])]
-)
-""", encoding='utf-8')
     PyInstaller.__main__.run([
         '--noconfirm', '--onedir', '--windowed', '--noupx', '--name', 'CareerStats',
-        '--version-file', str(version_file),
         '--contents-directory', 'Runtime', '--paths', str(ROOT/'runtime'),
         '--distpath', str(BUILD/'dist'), '--workpath', str(BUILD/'pyinstaller'),
         '--specpath', str(BUILD), str(ROOT/'runtime/desktop.py'),
@@ -123,7 +106,7 @@ def write_zip(path, files):
 def source_files():
     top = ('README.md', 'INSTALLATION.md', 'FEATURES.md', 'DATA.md', 'CONTRIBUTING.md',
            'ARCHITECTURE.md', 'KNOWN_LIMITATIONS.md', 'LICENSE_REVIEW.md', 'RELEASE_REPORT.md',
-           'SOCCERGAMING_DRAFT.md', 'CHANGELOG.md', 'DEVELOPMENT.md', 'Diagnostics.cmd', '.gitignore')
+           'SOCCERGAMING_DRAFT.md', 'DEVELOPMENT.md', 'Diagnostics.cmd', '.gitignore')
     yield from ((ROOT/name, name) for name in top)
     for name, extensions in {
         'runtime': {'.py'}, 'native': {'.rs'}, 'profiles': {'.json'},
@@ -141,7 +124,7 @@ def package(portable):
     OUTPUT.mkdir(exist_ok=True)
     fixed_docs = [(ROOT/'packaging/README.txt', 'README.txt')]
     fixed_docs.extend((ROOT/name, f'Notices/{name}')
-                      for name in ('DATA.md', 'FEATURES.md', 'LICENSE_REVIEW.md', 'CHANGELOG.md'))
+                      for name in ('DATA.md', 'FEATURES.md', 'LICENSE_REVIEW.md'))
     write_zip(USER_ZIP, [(file, file.relative_to(portable).as_posix())
                          for file in portable.rglob('*') if file.is_file()] + fixed_docs)
     write_zip(SOURCE_ZIP, list(source_files()))

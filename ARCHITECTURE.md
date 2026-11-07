@@ -45,12 +45,4 @@ Career Stats does not open `data/db/fifa_ng_db.db`. It reads the loose `data/db/
 
 The monitor and observer use native events and fixed code locations. They do not depend on the contents of the roster database, ANT catalog or competition engine DLL as direct inputs. The player bridge reads two reference instructions from the native BIN. Player history joins by FIFA player ID and club records by FIFA team ID. Save statistics use roster IDs and the existing 48-byte statistics layout. No catalog-wide player, club, or competition mapping is required.
 
-## Assist decoding
-
-The save tail contains 48-byte player statistics rows. Each row carries a 32-bit player ID, a 16-bit native group, minutes and rating counters, appearances at offset 10, goals at offset 11 and an unsigned assist count at offset 13. The group identifies a set of accumulated records and still needs an independent competition mapping. The decoder applies the same field layout across clubs, saves and identified competitions.
-
-The reader looks for at least eight consecutive records in an aligned group. A fragmented group can qualify with at least eight distinct aligned rows, a run of at least four, and the same alignment as an independently anchored group in that snapshot. The registry retains the raw bytes and offsets. Publication checks that the stored fields agree with those bytes, and uses the automatic assist count only for snapshots accepted with full CRC validation. An exact manual row check remains usable. Legacy per-competition decoder certifications still apply to clean sheets.
-
-PLAYER HISTORY takes the latest eligible observation per player, club, competition and season in the selected save lineage. The native row has no club ID. When one player appears in multiple club contexts for the same season and native group or identified competition, the assist values for those rows stay unknown. This avoids adding cumulative values that may have followed a transfer. The UI sums available numeric values and may show a partial total.
-
 The APT transport uses 512 buckets of 32 KiB, an epoch marker and a separate club reservation. Delimiters are reserved and some APT literals have Latin-1 limits. The monitor bounds its memory scans and validates the reservations before writing. The registry stores immutable save snapshots and evidence. See [DATA.md](DATA.md) for the historical schema and coverage policy.

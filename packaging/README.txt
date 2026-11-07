@@ -1,5 +1,5 @@
 FIFA 16 CAREER STATS
-v0.1.1 Beta · Windows x64 · 2015/16 Career Mode
+Windows x64 · 2015/16 Career Mode
 
 1. Extract the entire ZIP into a folder.
 2. Open CareerStats.exe.

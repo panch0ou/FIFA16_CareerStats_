@@ -78,16 +78,15 @@ def binary_table(fields, rows):
     return header + data + pack('<I', fifa_crc(data))
 
 
-def make_save(date, *, stats=False, missing_binary_field=False, include_leagues=True,
-              club=CLUB, season=1, assist_groups=None):
+def make_save(date, *, stats=False, missing_binary_field=False, include_leagues=True):
     ids = list(range(PLAYER, PLAYER+8))
     content = {
-        'career_users': [(club, season, 13, 773)],
-        'career_calendar': [(date, 20150701+(season-1)*10000, 20160630+(season-1)*10000)],
-        'teamplayerlinks': [(club, player) for player in ids] + [(20, 777)],
+        'career_users': [(CLUB, 1, 13, 773)],
+        'career_calendar': [(date, 20150701, 20160630)],
+        'teamplayerlinks': [(CLUB, player) for player in ids] + [(20, 777)],
         'players': [(player, 0 if player == PLAYER else 6, 87) for player in [777, *ids]],
         'leagues': [(13, 'England Premier League (1)', 14, 1)],
-        'teams': [(20,), (club,)],
+        'teams': [(20,), (CLUB,)],
         'customtable': [(42,)],
     }
     directory, blocks = bytearray(), bytearray()
@@ -108,13 +107,11 @@ def make_save(date, *, stats=False, missing_binary_field=False, include_leagues=
     save[16:32] = b'Disposable save\0'
     save[116:132] = b'SaveType_Career\0'
     save += header + directory + pack('<I', fifa_crc(directory)) + blocks
-    groups = assist_groups if assist_groups is not None else ({773: [0]*len(ids)} if stats else {})
-    for group, counts in groups.items():
-        for player, assists in zip(ids, counts, strict=True):
+    if stats:
+        for player in ids:
             row = bytearray(48)
-            pack_into('<IHHH', row, 0, player, group, 90, 700)
-            row[10:12] = b'\x03\x02' if assist_groups is not None else b'\x01\x02'
-            row[13] = assists
+            pack_into('<IHHH', row, 0, player, 773, 90, 700)
+            row[10:12] = b'\x01\x02'
             save += row
     pack_into('<I', save, 132, container_crc(save))
     return bytes(save)

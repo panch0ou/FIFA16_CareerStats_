@@ -1,6 +1,5 @@
 .local/
 release/
-Release_v*/
 __pycache__/
 *.pyc
 *.sqlite*
