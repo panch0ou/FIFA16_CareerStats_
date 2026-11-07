@@ -1,0 +1,948 @@
+{
+  "schema": 1,
+  "as_of": "2014/15",
+  "clubs": {
+    "144": {
+      "club_id": 144,
+      "club_name": "Fulham",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Johnny Haynes",
+          "value": 658,
+          "season": null,
+          "source": {
+            "kind": "club_record",
+            "reference": "https://www.fulhamfc.com/news/2013/june/28/moments-that-made-ffc",
+            "scope": "all_official",
+            "confidence": "high"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Gordon Davies",
+          "value": 178,
+          "season": null,
+          "source": {
+            "kind": "club_record",
+            "reference": "https://www.fulhamfc.com/tickets-and-hospitality/hospitality/hospitality-hosts/gordon-davies/",
+            "scope": "all_official",
+            "confidence": "high"
+          }
+        },
+        "most_assists": {
+          "player_id": 18919,
+          "player_name": "Steed Malbranque",
+          "value": 20,
+          "season": null,
+          "source": {
+            "kind": "reconstructed_lower_bound",
+            "reference": "https://github.com/salimt/football-datasets",
+            "scope": "league_only_partial",
+            "confidence": "provisional",
+            "note": "Suma de ligas 2001-2006; empate con Bobby Zamora en el conjunto filtrado, se conserva el poseedor más antiguo. No equivale a todas las competiciones."
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Frank Newton",
+          "value": 43,
+          "season": "1931/32",
+          "source": {
+            "kind": "historical_league",
+            "reference": "https://www.rsssf.org/tablese/engtops.html",
+            "scope": "league",
+            "confidence": "high"
+          }
+        },
+        "most_assists": {
+          "player_id": 18919,
+          "player_name": "Steed Malbranque",
+          "value": 13,
+          "season": "2003/04",
+          "source": {
+            "kind": "dataset_league",
+            "reference": "https://github.com/salimt/football-datasets",
+            "scope": "league",
+            "confidence": "provisional",
+            "note": "Transfermarkt/salimt registra 13; otras fuentes aplican definiciones de asistencia diferentes."
+          }
+        }
+      }
+    },
+    "1": {
+      "club_id": 1,
+      "club_name": "Arsenal",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "David O'Leary",
+          "value": 722,
+          "season": null,
+          "source": {
+            "kind": "club_record",
+            "reference": "https://www.arsenal.com/feature/on-this-day-in...-affGL5G50ETV",
+            "scope": "all_official",
+            "confidence": "high"
+          }
+        },
+        "most_goals": {
+          "player_id": 1625,
+          "player_name": "Thierry Henry",
+          "value": 228,
+          "season": null,
+          "source": {
+            "kind": "club_record",
+            "reference": "https://arsenal-fc.shorthandstories.com/228-the-story-of-thierry-henrys-final-arsenal-goal/index.html",
+            "scope": "all_official",
+            "confidence": "high"
+          }
+        },
+        "most_assists": {
+          "player_id": 1625,
+          "player_name": "Thierry Henry",
+          "value": 74,
+          "season": null,
+          "source": {
+            "kind": "league_record_lower_bound",
+            "reference": "https://www.premierleague.com/en/events/hall-of-fame/inductees/thierry-henry",
+            "scope": "league_only_partial",
+            "confidence": "provisional",
+            "note": "Premier League confirma 74 en liga; no existe aquí un total fiable de todas las competiciones."
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Ted Drake",
+          "value": 42,
+          "season": "1934/35",
+          "source": {
+            "kind": "historical_league",
+            "reference": "https://www.11v11.com/players/ted-drake-44710/",
+            "scope": "league",
+            "confidence": "high"
+          }
+        },
+        "most_assists": {
+          "player_id": 1625,
+          "player_name": "Thierry Henry",
+          "value": 20,
+          "season": "2002/03",
+          "source": {
+            "kind": "league_record",
+            "reference": "https://www.premierleague.com/en/events/hall-of-fame/inductees/thierry-henry",
+            "scope": "league",
+            "confidence": "high"
+          }
+        }
+      }
+    },
+    "10030": {
+      "club_id": 10030,
+      "club_name": "SC Paderborn 07",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Markus Krösche",
+          "value": 373,
+          "season": null,
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.worldfootball.net/teams/te1651/sc-paderborn-07/",
+            "scope": "recorded competitive appearances",
+            "note": "373 en fuente estadística; confirmar cobertura",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Veselin Gerov",
+          "value": 77,
+          "season": null,
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.worldfootball.net/teams/te1651/sc-paderborn-07/",
+            "scope": "recorded goals",
+            "note": "Fuente registra 77 goles, no 95",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Alban Meha",
+          "value": 10,
+          "season": "2011/12",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/sc-paderborn-07/startseite/verein/127/saison_id/2011",
+            "scope": "2. Bundesliga",
+            "note": "Dato de temporada utilizado como mínimo histórico; no implica récord absoluto",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Nick Proschwitz",
+          "value": 17,
+          "season": "2011/12",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/sc-paderborn-07/startseite/verein/127/saison_id/2011",
+            "scope": "2. Bundesliga",
+            "note": "Máximo documentado en temporadas consultadas",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Alban Meha",
+          "value": 10,
+          "season": "2011/12",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/sc-paderborn-07/startseite/verein/127/saison_id/2011",
+            "scope": "2. Bundesliga",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "111817": {
+      "club_id": 111817,
+      "club_name": "Paris FC",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Lamri Laachi",
+          "value": 270,
+          "season": "1973-1988",
+          "source": {
+            "kind": "historical_pre2015",
+            "reference": "https://fr.wikipedia.org/wiki/Paris_Football_Club",
+            "scope": "club league appearances",
+            "note": "Demarconnay superó este registro en 2020; su acumulado en 2015 no está fijado",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Jean-François Beltramini",
+          "value": 37,
+          "season": "1975-1979",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://fr.wikipedia.org/wiki/Paris_Football_Club",
+            "scope": "club league goals",
+            "note": "Algunas fuentes cuentan 39 en todas competiciones; 37 en tabla de liga",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": null,
+          "value": null,
+          "season": null,
+          "source": {
+            "kind": "not_found",
+            "reference": "",
+            "scope": "",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "François Félix",
+          "value": 19,
+          "season": "1973/74",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/paris-fc/startseite/verein/10004/saison_id/1973",
+            "scope": "Division 1",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": null,
+          "value": null,
+          "season": null,
+          "source": {
+            "kind": "not_found",
+            "reference": "",
+            "scope": "",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "110734": {
+      "club_id": 110734,
+      "club_name": "FC Crotone",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Antonio Galardo",
+          "value": 400,
+          "season": null,
+          "source": {
+            "kind": "computed_from_source",
+            "reference": "https://it.wikipedia.org/wiki/Antonio_Galardo_(calciatore)",
+            "scope": "all official competitions through 2014/15",
+            "note": "Total 401 incluye un partido de Coppa Italia en 2015/16, posterior al corte; se restó 1.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Andrea Deflorio",
+          "value": 54,
+          "season": null,
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.transfermarkt.com/fc-crotone/toptorschuetzen/verein/4083",
+            "scope": "indexed club goals",
+            "note": "Antes de Simy (posterior a 2015)",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Camillo Ciano",
+          "value": 5,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/3074d7b1/2014-2015/all_comps/Crotone-Stats-All-Competitions",
+            "scope": "Serie B",
+            "note": "5 asistencias en Serie B 2014/15; como mínimo documentado",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Andrea Deflorio",
+          "value": 28,
+          "season": "1999/00",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.transfermarkt.com/fc-crotone/toptorschuetzensaison/verein/4083",
+            "scope": "Serie C1 Girone B",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Camillo Ciano",
+          "value": 5,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/3074d7b1/2014-2015/all_comps/Crotone-Stats-All-Competitions",
+            "scope": "Serie B",
+            "note": "5 asistencias en Serie B 2014/15; como mínimo documentado",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "361": {
+      "club_id": 361,
+      "club_name": "Stevenage FC",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Ronnie Henry",
+          "value": 366,
+          "season": "2004-2015",
+          "source": {
+            "kind": "computed_from_source",
+            "reference": "https://stevenagefootballarchive.com/player.php?id=54",
+            "scope": "all competitions through 2014/15",
+            "note": "Suma de las temporadas del perfil hasta 2014/15: 18+35+50+39+49+46+51+40+38=366; las 502 de la web incluyen 2015-19. Puede no ser récord absoluto al corte.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Martin Gittings",
+          "value": 216,
+          "season": "1981-1994",
+          "source": {
+            "kind": "historical_pre2015",
+            "reference": "https://www.boroguide.co.uk/",
+            "scope": "club first team",
+            "note": "Archivo alternativo registra 216 goles; Stevenage Football Archive usa otra cobertura y atribuye 156 a Lummy Taylor",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Luke Freeman",
+          "value": 6,
+          "season": "2013/14",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/fc-stevenage/startseite/verein/3684/saison_id/2013",
+            "scope": "League One",
+            "note": "Dato de temporada como mínimo acumulado",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Doug Hawkins",
+          "value": 48,
+          "season": "1950/51",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://stevenagefootballarchive.com/records-players.php",
+            "scope": "all competitions",
+            "note": "Posible antecedente de club pre-1976; revisar identidad institucional si se requiere",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Luke Freeman",
+          "value": 6,
+          "season": "2013/14",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/fc-stevenage/startseite/verein/3684/saison_id/2013",
+            "scope": "League One",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "15015": {
+      "club_id": 15015,
+      "club_name": "Burton Albion",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Darren Stride",
+          "value": 646,
+          "season": "1993-2010",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://footballfacts.co.uk/clubs/england/burton-albion/burton-albion.php",
+            "scope": "competitive appearances",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Richie Barker",
+          "value": 159,
+          "season": "1960-1968",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://footballfacts.co.uk/clubs/england/burton-albion/burton-albion.php",
+            "scope": "competitive goals",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Stuart Beavon",
+          "value": 11,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/b09787c5/2014-2015/all_comps/Burton-Albion-Stats-All-Competitions",
+            "scope": "Football League",
+            "note": "Asistencias de una temporada, no total de carrera",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Stan Round",
+          "value": 59,
+          "season": "1965/66",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://en.wikipedia.org/wiki/List_of_Burton_Albion_F.C._records_and_statistics",
+            "scope": "competitive goals",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Stuart Beavon",
+          "value": 11,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/b09787c5/2014-2015/all_comps/Burton-Albion-Stats-All-Competitions",
+            "scope": "Football League",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "741": {
+      "club_id": 741,
+      "club_name": "Antalyaspor",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": null,
+          "value": null,
+          "season": null,
+          "source": {
+            "kind": "not_found",
+            "reference": "",
+            "scope": "",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Tita",
+          "value": 37,
+          "season": "before 2015",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.antalyaspor.com.tr/tr/futbol-haberleri/tac_giymesine_4_gol_kaldi_2017-05-02_161511.html",
+            "scope": "Süper Lig",
+            "note": "Fuente oficial de 2017 confirma que Tita ostentaba 37 antes de la llegada de Eto’o en 2015.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Emrah Başsan",
+          "value": 9,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/antalyaspor/startseite/verein/589/saison_id/2014",
+            "scope": "1. Lig",
+            "note": "Asistencias de temporada como mínimo",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Lamine Diarra",
+          "value": 15,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/antalyaspor/startseite/verein/589/saison_id/2014",
+            "scope": "1. Lig",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Emrah Başsan",
+          "value": 9,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/antalyaspor/startseite/verein/589/saison_id/2014",
+            "scope": "1. Lig",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "1786": {
+      "club_id": 1786,
+      "club_name": "Randers FC",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": null,
+          "value": null,
+          "season": "before 2015",
+          "source": {
+            "kind": "not_found",
+            "reference": "https://randersfc.dk/klubben/historien",
+            "scope": "club first team games",
+            "note": "No se puede utilizar 262 de Mads Fenger: incluye partidos posteriores a 2015.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Ronnie Schwartz",
+          "value": 40,
+          "season": "2011-2014",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://randersfc.dk/klubben/historien",
+            "scope": "club first team goals",
+            "note": "La lista oficial atribuye 40 a Schwartz",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Kasper Fisker",
+          "value": 5,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/randers-fc/startseite/verein/5724/saison_id/2014",
+            "scope": "Superliga",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Marc Nygaard",
+          "value": 16,
+          "season": "2008/09",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://superstats.dk/hold/rfc/alltime?vis=topscorere",
+            "scope": "Superliga",
+            "note": "Mejor marca visible en lista de goleadores por temporada hasta 2015",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Kasper Fisker",
+          "value": 5,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.transfermarkt.com/randers-fc/startseite/verein/5724/saison_id/2014",
+            "scope": "Superliga",
+            "note": "Empatado con Nicolai Poulsen",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "110980": {
+      "club_id": 110980,
+      "club_name": "Colo-Colo",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Lizardo Garrido",
+          "value": 560,
+          "season": "1979-1993",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://mexpedia.org/index.php/Anexo:Jugadores_con_m%C3%A1s_partidos_del_Club_Social_y_Deportivo_Colo-Colo",
+            "scope": "all official competitions",
+            "note": "Fuente distingue 560 totales de 324 de liga",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Carlos Caszely",
+          "value": 207,
+          "season": "1967-1985",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.historiadecolocolo.com/goleadores.html",
+            "scope": "all official competitions",
+            "note": "Fuente da 207, otras dan 208; se prioriza desglose 168+2+15+22=207",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Marcelo Barticciotto",
+          "value": 90,
+          "season": "hasta 2015",
+          "source": {
+            "kind": "user_provided",
+            "reference": "",
+            "scope": "all official competitions",
+            "note": "Valor indicado por el usuario; pendiente de fuente externa.",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Lucas Barrios",
+          "value": 37,
+          "season": "2008",
+          "source": {
+            "kind": "user_provided",
+            "reference": "",
+            "scope": "Chilean Primera División",
+            "note": "Valor indicado por el usuario; pendiente de fuente externa.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Matías Fernández",
+          "value": 24,
+          "season": "2006",
+          "source": {
+            "kind": "user_provided",
+            "reference": "",
+            "scope": "all official competitions",
+            "note": "Valor indicado por el usuario; pendiente de fuente externa.",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "112110": {
+      "club_id": 112110,
+      "club_name": "Rangers de Talca",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Iván Azócar",
+          "value": 386,
+          "season": "before 2015",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://futbolchileno.fandom.com/es/wiki/Rangers_de_Talca",
+            "scope": "club appearances",
+            "note": "Fuente secundaria",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Juan Soto Mura",
+          "value": 81,
+          "season": "before 2015",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.emol.com/noticias/deportes/detalle/detallenoticias.asp?idnoticia=331653",
+            "scope": "Primera División goals",
+            "note": "Récord de goles en Primera División, no necesariamente todas competiciones",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": null,
+          "value": null,
+          "season": null,
+          "source": {
+            "kind": "not_found",
+            "reference": "",
+            "scope": "",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Héctor Emilio Scandolli",
+          "value": 25,
+          "season": "1965",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.emol.com/noticias/deportes/detalle/detallenoticias.asp?idnoticia=331653",
+            "scope": "Primera División",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": null,
+          "value": null,
+          "season": null,
+          "source": {
+            "kind": "not_found",
+            "reference": "",
+            "scope": "",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "463": {
+      "club_id": 463,
+      "club_name": "Deportivo Alavés",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Martín Astudillo",
+          "value": 346,
+          "season": "before 2015",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://deportivoalaves.com/noticias/manu-garcia-segundo-jugador-con-mas-partidos-en-la-historia-del-deportivo-alaves",
+            "scope": "top two divisions appearances",
+            "note": "Club oficial ratifica 346; cobertura excluye divisiones inferiores a Segunda",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Manolo Serrano",
+          "value": 67,
+          "season": "before 2015",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://kirolakeitb.eus/es/futbol/equipos/alaves/2021/12/11/joselu-se-convierte-en-maximo-goleador-historico-del-alaves-en-primera/",
+            "scope": "all divisions historical club goals",
+            "note": "Máximo goleador absoluto, según medio 2021, periodo 1992-1998.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Jordi Cruyff",
+          "value": 6,
+          "season": "2000/01",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/8d6fd021/2000-2001/Alaves-Stats",
+            "scope": "La Liga",
+            "note": "6 asistencias de temporada; mínimo de carrera",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Javi Moreno",
+          "value": 22,
+          "season": "2000/01",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://www.laliga.com/noticias/que-fue-de-javi-moreno",
+            "scope": "La Liga",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Jordi Cruyff",
+          "value": 6,
+          "season": "2000/01",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/8d6fd021/2000-2001/Alaves-Stats",
+            "scope": "La Liga",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    },
+    "112398": {
+      "club_id": 112398,
+      "club_name": "Pro Vercelli",
+      "all_time": {
+        "most_appearances": {
+          "player_id": null,
+          "player_name": "Mario Ardissone",
+          "value": 354,
+          "season": "1919-1935",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.bianchecasacche.eu/le-bandiere/mario-ardissone/",
+            "scope": "official league appearances",
+            "note": "Fuente especializada da 354, no 355; suma de 16 temporadas.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Mario Ardissone",
+          "value": 74,
+          "season": "1919-1935",
+          "source": {
+            "kind": "record_candidate",
+            "reference": "https://www.bianchecasacche.eu/le-bandiere/mario-ardissone/",
+            "scope": "official league goals",
+            "note": "74 supera los 51 de Piola en Serie A; cobertura antigua puede variar.",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Massimiliano Scaglia",
+          "value": 5,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/119d232e/2014-2015/all_comps/Pro-Vercelli-Stats-All-Competitions",
+            "scope": "Serie B",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      },
+      "single_season": {
+        "most_goals": {
+          "player_id": null,
+          "player_name": "Ettore Marchi",
+          "value": 17,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/119d232e/2014-2015/all_comps/Pro-Vercelli-Stats-All-Competitions",
+            "scope": "Serie B",
+            "note": "Mejor marca documentada moderna; no necesariamente récord histórico total",
+            "cutoff": "2015-06-30"
+          }
+        },
+        "most_assists": {
+          "player_id": null,
+          "player_name": "Massimiliano Scaglia",
+          "value": 5,
+          "season": "2014/15",
+          "source": {
+            "kind": "minimum_documented",
+            "reference": "https://fbref.com/en/squads/119d232e/2014-2015/all_comps/Pro-Vercelli-Stats-All-Competitions",
+            "scope": "Serie B",
+            "note": "",
+            "cutoff": "2015-06-30"
+          }
+        }
+      }
+    }
+  }
+}

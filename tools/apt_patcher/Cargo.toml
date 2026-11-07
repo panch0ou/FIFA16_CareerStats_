@@ -1,0 +1,8 @@
+[package]
+name = "fifa16-career-apt-probe"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+apt = { path = "apt" }
+serde_json = "1"

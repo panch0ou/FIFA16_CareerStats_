@@ -1,0 +1,12 @@
+# Known limitations
+
+- The executable and native BIN must match `profiles/fifa16-2015-16.json`. A product-version label alone does not establish compatibility. FIP, other executables, modern seasons, and console versions are outside the verified profile.
+- The project owner reported that the preceding portable build worked in FIFA 16. This compatibility update was tested offline with disposable game files and synthetic saves. It has not been retested inside FIFA.
+- The launcher accepts changes to the roster database. It requires readable save metadata for the fields it uses. The two required screen templates must have verified content. Repacking or alignment changes can pass, while changed required APT, constants or retained archive data require separate validation.
+- Unmapped IDs have no matching history. Reused IDs can display history for the original entity. Edited or new competitions can have incomplete Career statistics when their native tuple has not been corroborated.
+- The strict save reader may reject a save that FIFA loads. The private build's one-save zero-CRC exception and the legacy private snapshot import were removed.
+- Automatic Career competition classification covers the exact Premier League and Championship tuples in the profile. Stats for other competitions or fields can remain unknown pending corroboration. Unsaved progress, full seasons in unsimulated leagues and transfer splits have no verified extraction contract.
+- Historical coverage is incomplete. The five CLUB HISTORY values are static baseline records or candidates. The ALL COMPETITIONS heading does not express each candidate's actual source scope. Some glyphs can be simplified by the inherited APT.
+- Recovery refuses modified or unrelated cache files. Leave the journal available if recovery is blocked. An unexpected termination can leave empty cache directories.
+- The existing native observer captures recognized DATA reads between 5,000,000 bytes and 16 MiB. Binary table limits, the verified statistics layout, and the screen's row and bucket capacity still apply to enlarged saves.
+- OneDrive profiles must be locally available and pass the same filesystem safety checks. Choosing a profile in the launcher tells Career Stats where to look. FIFA still uses the profile selected by the game and Windows.

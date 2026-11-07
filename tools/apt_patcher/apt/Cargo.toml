@@ -1,0 +1,10 @@
+[package]
+name = "apt"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+thiserror = "2"
+byteorder = "1"
+log = "0.4"

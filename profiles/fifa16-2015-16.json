@@ -1,0 +1,52 @@
+{
+  "id": "fifa16-2015-16",
+  "first_season": 2015,
+  "historical_before": 2015,
+  "game": {
+    "fifa16.exe": "889772d3192c74ce4c1f2b7b3467cc96f9f1123aaf347bce7b199333dbac7a9d",
+    "fifa16.bin": "17e68370b8c875a10b9f463b4f684f4dad9dd5b6b04178fb674cdd9b192be6c1",
+    "winmm.dll": null,
+    "dinput8.dll": null,
+    "dinput8_orig.dll": null,
+    "Gameplay_Extender.dll": null,
+    "dinput8_L9.ini": null
+  },
+  "compatible_leagues": [
+    {
+      "league": 13,
+      "primary": 773,
+      "native": "England Premier League (1)",
+      "country": 14,
+      "level": 1,
+      "label": "Barclays Premier League"
+    },
+    {
+      "league": 14,
+      "primary": 776,
+      "native": "England League Championship (2)",
+      "country": 14,
+      "level": 2,
+      "label": "Football League Championship"
+    }
+  ],
+  "history_sha256": "b9be4bee16571ed8d61ebdcf52e436d4c2c5151adb457b3bfc1cbf551f73a185",
+  "screens": {
+    "PlayerHistory12D_Ampliado.apt": "d232614a97eb56f0c8848d153f335a052a58a054258c6a0a97a7247525fab025",
+    "PlayerHistory12D_Ampliado.bigf": "3cc004d061430ce4e31439399fc6a84a90491f3acf7ff62a2448a83acbae6fa3",
+    "ClubHistory12D.apt": "a5c7c815c21204c47044ce0c761bca5fb62d0bf19fd77ef84ef2a713c4cb58bf",
+    "ClubHistory12D.bigf": "b1f261f7874d1b6e4ca4d24a30d7ce8c19899ff1ddf912e0adf33b783bd81155"
+  },
+  "screen_sources": {
+    "SquadRanking": "cb263ce31e47d523e542d900bd1e9dca00c4a6a953ad1a245aaa939b8ba968e4",
+    "ManagerModeSeasonObjectives": "b52bb7b68354cbd67dfe9fd5851a42c16cd7c8e6a3ce24c85dda01301a09136f"
+  },
+  "club_records_sha256": "55dfcf4dfabee88002e0c11494d51d31754e52cbb415f28c191cae5594d3a483",
+  "historical_clubs": {
+    "931": 144,
+    "11": 1,
+    "2433": 110980,
+    "1050": 483,
+    "336": 237,
+    "430": 110374
+  }
+}
