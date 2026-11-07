@@ -1,10 +1,10 @@
 # FIFA 16 Career Stats
 
-**v0.1.1 Beta** · [Changelog](CHANGELOG.md)
+**v0.1.2 Beta** · [Changelog](CHANGELOG.md)
 
 Career Stats adds **PLAYER HISTORY** and **CLUB HISTORY** to FIFA 16 PC Manager Career. The initial profile follows the 2015/16 timeline. The historical baseline covers 10,142 FIFA player IDs and 13 clubs.
 
-This update publishes Career Mode assists from validated records in identified competitions. It can use the raw rows already in your local Career Stats history.
+Already started a Career? Choose **Import Existing Career** in the launcher. Import a single save or link checkpoints from the same Career to recover the statistics they still contain. [Import instructions](INSTALLATION.md#import-an-existing-career)
 
 ## Play
 

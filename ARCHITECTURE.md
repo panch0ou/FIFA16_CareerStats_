@@ -8,6 +8,8 @@
 | `runtime/observar_cargas.py`, `native/observer.rs`, `runtime/bridge.py` | Existing observer and Player ID bridge, scoped to the verified game process |
 | `runtime/guardados.py`, `estado_activo.py`, `carreras.py` | Save events, identity, CRC-checked read-only extraction and snapshot ancestry |
 | `runtime/career_schema.py`, `runtime/transferengine` | Required metadata projection and bounded DATA decoding |
+| `runtime/import_dialog.py`, `runtime/career_import.py` | Save discovery, preview, chronological linking and atomic registration |
+| `runtime/competition_catalog.py` | Read-only native competition objects, official types and CRC-validated English names, shared by import and tracking |
 | `runtime/datos.py`, `transporte.py`, `monitor.py` | Historical and tracked data formatting, bounded screen publication and worker lifecycle |
 | `runtime/screen_assets.py`, `tools/build_payload.py`, `tools/apt_patcher` | Extract game templates, generate and repack screens, compile portable helpers |
 | `tools/package_release.py`, `Diagnostics.cmd` | Build the portable and source archives and run developer diagnostics |
@@ -42,8 +44,13 @@ Career Stats does not open `data/db/fifa_ng_db.db`. It reads the loose `data/db/
 | `teamplayerlinks` | `teamid`, `playerid` for the current roster |
 | `players` | Optional `playerid` and `preferredposition1` for goalkeeper position |
 | `leagues` | Optional `leagueid`, `leaguename`, `countryid`, `level` for league classification |
+| `career_competitionprogress` | Optional competition object, short code, team and season to cross-check the native competition catalog |
 
 The monitor and observer use native events and fixed code locations. They do not depend on the contents of the roster database, ANT catalog or competition engine DLL as direct inputs. The player bridge reads two reference instructions from the native BIN. Player history joins by FIFA player ID and club records by FIFA team ID. Save statistics use roster IDs and the existing 48-byte statistics layout. No catalog-wide player, club, or competition mapping is required.
+
+## Career imports
+
+Career imports share the same read-only parser, identity hashes and ancestry tables as the monitor. The preview runs on an in-memory registry copy. On confirmation the importer re-reads each file, verifies its hash, recomputes the preview, and validates affected PLAYER HISTORY payloads inside a single transaction. Duplicate hashes reuse registered snapshots. An explicit backfill can link new earlier checkpoints before the selected root while preserving the Career ID and later branches. Imports use the existing database schema.
 
 ## Assist decoding
 
@@ -51,6 +58,6 @@ The save tail contains 48-byte player statistics rows. Each row carries a 32-bit
 
 The reader looks for at least eight consecutive records in an aligned group. A fragmented group can qualify with at least eight distinct aligned rows, a run of at least four, and the same alignment as an independently anchored group in that snapshot. The registry retains the raw bytes and offsets. Publication checks that the stored fields agree with those bytes, and uses the automatic assist count only for snapshots accepted with full CRC validation. An exact manual row check remains usable. Legacy per-competition decoder certifications still apply to clean sheets.
 
-PLAYER HISTORY takes the latest eligible observation per player, club, competition and season in the selected save lineage. The native row has no club ID. When one player appears in multiple club contexts for the same season and native group or identified competition, the assist values for those rows stay unknown. This avoids adding cumulative values that may have followed a transfer. The UI sums available numeric values and may show a partial total.
+PLAYER HISTORY takes the latest eligible observation per player, club, competition and season in the selected save lineage. The native row has no club ID. When one player appears in multiple club contexts for the same season and native group or identified competition, the displayed counts for those rows stay unknown. This avoids adding cumulative values that may have followed a transfer. The UI sums available numeric values and may show a partial total.
 
 The APT transport uses 512 buckets of 32 KiB, an epoch marker and a separate club reservation. Delimiters are reserved and some APT literals have Latin-1 limits. The monitor bounds its memory scans and validates the reservations before writing. The registry stores immutable save snapshots and evidence. See [DATA.md](DATA.md) for the historical schema and coverage policy.

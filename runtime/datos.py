@@ -1,7 +1,8 @@
 """Formats the two APT views from one immutable Career head."""
 from collections import defaultdict
-from contextlib import closing
+from contextlib import closing, nullcontext
 import json
+import re
 import sqlite3
 
 import carreras
@@ -30,12 +31,32 @@ def historical():
                 'USING(fifa_id,season_start,club_id,league_id) '
                 'WHERE s.season_start<? AND s.fifa_id>0 ORDER BY s.fifa_id,s.season_start,s.rowid', (HISTORICAL_BEFORE,)):
             row = (season or season_label(year), apps, goals, assists, None, f'{name} / {competition}')
-            history[pid].append((HISTORICAL_CLUBS.get(str(club)), tuple(map(safe, row))))
+            history[pid].append((HISTORICAL_CLUBS.get(str(club)), tuple(map(safe, row)),
+                                 (year, 0 if str(row[0]).isdigit() else 1)))
     return history
 
 
 def season_label(year):
     return f'{year % 100:02d}/{(year+1) % 100:02d}'
+
+
+def chronological_key(record):
+    club, row = record[:2]
+    label = row[0].strip()
+    if len(record) > 2:
+        period = record[2]
+    elif re.fullmatch(r'\d{4}', label):
+        period = (int(label), 0)
+    elif re.fullmatch(r'\d{2}/\d{2}', label):
+        # The display covers the historical baseline and FIFA 16's Career years.
+        # Keep 99/00 before 00/01 instead of sorting the abbreviated year text.
+        year = int(label[:2])
+        period = (1900 + year if year >= 50 else 2000 + year, 1)
+    elif re.fullmatch(r'\d{4}/\d{2,4}', label):
+        period = (int(label[:4]), 1)
+    else:
+        period = (10000, 0)
+    return (*period, row[5].casefold(), -1 if club is None else club, row)
 
 
 def safe(value):
@@ -54,11 +75,11 @@ def totals(rows):
 
 
 def player_line(pid, past, current, club_id, active):
-    records = [*past, *current]
-    rows = [row for _, row in records]
+    records = sorted([*past, *current], key=chronological_key)
+    rows = [record[1] for record in records]
     if len(rows) > 512:
         raise ValueError(f'Player {pid} exceeds the 512-row screen limit')
-    local = totals([row for context, row in records if club_id is not None and context == club_id])
+    local = totals([record[1] for record in records if club_id is not None and record[0] == club_id])
     career = totals(rows)
     if current:
         status = 'PRE-2015 + PARTIAL CAREER' if past else 'PARTIAL CAREER STATS'
@@ -90,11 +111,11 @@ class Source:
         for pid, rows in self.past.items():
             self.historical_buckets[pid % BUCKETS].append(player_line(pid, rows, [], None, False))
 
-    def snapshot(self, head):
+    def snapshot(self, head, db=None):
         if head is None:
             return self.historical_buckets, 'WAIT', {'head': None}
-        data = carreras.history(head)
-        with carreras.connect() as db:
+        data = carreras.history(head, db)
+        with (carreras.connect() if db is None else nullcontext(db)) as db:
             root = db.execute('SELECT season,metadata FROM snapshots WHERE sha=?',
                               (data['ancestry'][-1],)).fetchone()
             club = db.execute('SELECT club FROM snapshots WHERE sha=?', (head,)).fetchone()[0]
@@ -103,9 +124,12 @@ class Source:
         for r in data['official_player_rows']:
             context = r['club_id']
             name = self.baseline['clubs'].get(str(context), {}).get('club_name', f'CLUB {context}')
-            row = (season_label(root_year + r['season'] - 1), *(r[k] for k in STAT_KEYS),
+            counts = ((None,)*len(STAT_KEYS) if r['assist_evidence'] == 'ambiguous_club_attribution'
+                      else tuple(r[k] for k in STAT_KEYS))
+            row = (season_label(root_year + r['season'] - 1), *counts,
                    f"{name} / {r['competition']}")
-            by_id[r['player_id']].append((context, tuple(map(safe, row))))
+            by_id[r['player_id']].append((context, tuple(map(safe, row)),
+                                         (root_year + r['season'] - 1, 1)))
         buckets = [[] for _ in range(BUCKETS)]
         for pid in sorted(self.past.keys() | by_id.keys()):
             buckets[pid % BUCKETS].append(player_line(pid, self.past.get(pid, ()), by_id.get(pid, ()), club, True))

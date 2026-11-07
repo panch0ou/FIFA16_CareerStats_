@@ -1,7 +1,8 @@
 """Read-only save extraction and a separate Career Mode registry."""
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import datetime as dt
 import json
+import os
 import sqlite3
 import struct
 import sys
@@ -22,6 +23,7 @@ except ModuleNotFoundError as exc:
 
 HERE = DB = ACTIVE = SCHEMA = None
 LEAGUES = {}
+COMPETITIONS = {}
 DDL="""
 PRAGMA foreign_keys=ON;
 CREATE TABLE IF NOT EXISTS careers(id TEXT PRIMARY KEY,label TEXT NOT NULL,evidence TEXT NOT NULL,created TEXT NOT NULL);
@@ -81,10 +83,41 @@ def validate_snapshot(snapshot):
     return 'crc_valid'
 
 
+CAREER_HEADER = b'SaveType_Career\0'
+MAX_SAVE_BYTES = 16 * 1024 * 1024 + 512
+
+
 def inspect(path):
-    path=safe_source(path);st=path.stat()
-    s=SaveSnapshot.read(path,SCHEMA);integrity=validate_snapshot(s)
-    if (path.stat().st_size,path.stat().st_mtime_ns)!=(st.st_size,st.st_mtime_ns):raise ValueError('The DATA changed while it was being read')
+    return inspect_data(safe_source(path))
+
+
+def inspect_external(path):
+    return inspect_data(external_path(path))
+
+
+def external_path(path):
+    path = Path(path)
+    if not path.is_absolute():
+        raise ValueError('Select an absolute path to a Career save.')
+    return target(Path(path.anchor), path.relative_to(path.anchor))
+
+
+def inspect_data(path):
+    if not path.is_file():
+        raise ValueError('Select a regular Career save file.')
+    with path.open('rb') as stream:
+        before = os.fstat(stream.fileno())
+        if before.st_size > MAX_SAVE_BYTES:
+            raise ValueError('The save exceeds the supported Career DATA size.')
+        data = stream.read(MAX_SAVE_BYTES + 1)
+    after = path.stat()
+    if ((before.st_size, before.st_mtime_ns, before.st_ino) !=
+            (after.st_size, after.st_mtime_ns, after.st_ino) or len(data) != before.st_size):
+        raise ValueError('The DATA changed while it was being read.')
+    if data[116:132] != CAREER_HEADER:
+        raise ValueError('This is not a FIFA 16 Career save.')
+    s = SaveSnapshot.from_bytes(data, SCHEMA)
+    integrity = validate_snapshot(s)
     user_fields = (*career_schema.REQUIRED['career_users'], *career_schema.OPTIONAL['career_users'])
     users=rows(s,'career_users',user_fields)
     calendar_fields = (*career_schema.REQUIRED['career_calendar'], *career_schema.OPTIONAL['career_calendar'])
@@ -113,11 +146,47 @@ def inspect(path):
     native_leagues=[(row['leaguename'],row['countryid'],row['level'])
                     for row in rows(s,'leagues',league_fields)
                     if len(row)==len(league_fields) and row['leagueid']==u.get('leagueid')]
-    return {'sha':s.sha256,'integrity':integrity,'source':str(path),'club':club,'season':u['seasoncount'],'date':c['currdate'],
+    value = {'sha':s.sha256,'integrity':integrity,'source':str(path),'club':club,'season':u['seasoncount'],'date':c['currdate'],
+        'modified_ns':before.st_mtime_ns,
         'save_label':s.data[16:80].split(b'\0')[0].decode('utf-8',errors='replace'),
         'user':u,'calendar':c,'roster':sorted(roster),'groups':groups,'records':records,
         'native_league':native_leagues[0] if len(native_leagues)==1 else None,
         'common_header_140_156':s.data[140:156].hex()}
+    progress_fields = career_schema.OPTIONAL['career_competitionprogress']
+    value['competition_progress'] = [row for row in rows(s, 'career_competitionprogress', progress_fields)
+                                     if len(row) == len(progress_fields)]
+    value['native_competitions'] = native_competitions(value)
+    return value
+
+
+def native_competitions(metadata):
+    if metadata.get('integrity') != 'crc_valid':
+        return {}
+    result = {}
+    for group in map(int, metadata.get('groups', {})):
+        rule = COMPETITIONS.get(group)
+        if rule is None:
+            continue
+        user = metadata['user']
+        if group == user.get('primarycompobjid') and rule['code'] != f"C{user.get('leagueid')}":
+            continue
+        progress = [r['compshortname'] for r in metadata.get('competition_progress', ())
+                    if r['compobjid'] == group and r['teamid'] == metadata['club']
+                    and r['season'] == metadata['season']]
+        if progress and set(progress) != {rule['code']}:
+            continue
+        result[str(group)] = rule
+    return result
+
+
+def competition_rules(db, checkpoint, metadata):
+    native = native_competitions(metadata)
+    native.update(metadata.get('native_competitions', {}))
+    rules = {int(group): rule for group, rule in native.items()}
+    for rule in db.execute('SELECT * FROM competition_rules WHERE career=? AND club=?',
+                           (checkpoint['career'], checkpoint['club'])):
+        rules[rule['group_raw']] = rule
+    return rules
 
 def bind(path,evidence,label=None,parent=None,expected_sha=None,known_league=False):
     if not evidence.strip():raise ValueError('Explicit evidence is required')
@@ -125,52 +194,60 @@ def bind(path,evidence,label=None,parent=None,expected_sha=None,known_league=Fal
     if expected_sha is not None and value['sha']!=expected_sha:
         raise ValueError('The DATA no longer matches the observed hash')
     with connect() as db:
-        existing=db.execute('SELECT * FROM snapshots WHERE sha=?',(value['sha'],)).fetchone()
-        if existing:
-            if parent:
-                p=db.execute('SELECT * FROM snapshots WHERE sha=?',(parent,)).fetchone()
-                if not p or p['career']!=existing['career']:raise ValueError('This hash belongs to another Career')
-                if parent!=existing['parent'] and parent!=existing['sha']:raise ValueError('An existing snapshot keeps its original parent')
-            if label:raise ValueError('This hash already has a Career identity')
-            db.execute('INSERT OR IGNORE INTO observations VALUES (?,?)',(value['sha'],value['source']))
-            return {'career':existing['career'],'sha':value['sha'],'result':'known_exact_hash_no_duplicate'}
+        return bind_snapshot(db, value, evidence, label, parent, known_league)
+
+
+def bind_snapshot(db, value, evidence, label=None, parent=None, known_league=False, *, prefix_career=None):
+    """Write a validated snapshot within the caller's transaction."""
+    existing=db.execute('SELECT * FROM snapshots WHERE sha=?',(value['sha'],)).fetchone()
+    if existing:
         if parent:
             p=db.execute('SELECT * FROM snapshots WHERE sha=?',(parent,)).fetchone()
-            if not p:raise ValueError('Unknown parent hash')
-            if value['season']<p['season'] or value['date']<p['date']:
-                raise ValueError('Choose the earlier snapshot that was loaded as the parent')
-            career=p['career']
-        elif label:
-            career=str(uuid.uuid4());db.execute('INSERT INTO careers VALUES (?,?,?,?)',(career,label,evidence,dt.datetime.now(dt.timezone.utc).isoformat()))
-        else:raise ValueError('Choose a new Career identity or confirm the parent save')
-        metadata={k:v for k,v in value.items() if k!='records'}
-        db.execute('INSERT INTO snapshots VALUES (?,?,?,?,?,?,?,?,?,?)',(value['sha'],career,parent,value['source'],value['club'],value['season'],value['date'],value['save_label'],evidence,json.dumps(metadata,ensure_ascii=False)))
-        primary=value['user'].get('primarycompobjid')
-        league=value['user'].get('leagueid')
-        if known_league and primary is not None and league is not None:
-            labels=db.execute("""
-                SELECT DISTINCT r.label FROM competition_rules r JOIN snapshots s
-                ON s.career=r.career AND s.club=r.club
-                WHERE r.club=? AND r.group_raw=? AND r.category='league'
-                AND json_extract(s.metadata,'$.user.primarycompobjid')=?
-                AND json_extract(s.metadata,'$.user.leagueid')=?
-                """,(value['club'],primary,primary,league)).fetchall()
-            if len(labels)==1:
+            if not p or p['career']!=existing['career']:raise ValueError('This hash belongs to another Career')
+            if parent!=existing['parent'] and parent!=existing['sha']:raise ValueError('An existing snapshot keeps its original parent')
+        if label:raise ValueError('This hash already has a Career identity')
+        db.execute('INSERT OR IGNORE INTO observations VALUES (?,?)',(value['sha'],value['source']))
+        return {'career':existing['career'],'sha':value['sha'],'result':'known_exact_hash_no_duplicate'}
+    if parent:
+        p=db.execute('SELECT * FROM snapshots WHERE sha=?',(parent,)).fetchone()
+        if not p:raise ValueError('Unknown parent hash')
+        if value['season']<p['season'] or value['date']<p['date']:
+            raise ValueError('Choose the earlier snapshot that was loaded as the parent')
+        career=p['career']
+    elif prefix_career:
+        career=prefix_career
+    elif label:
+        career=str(uuid.uuid4());db.execute('INSERT INTO careers VALUES (?,?,?,?)',(career,label,evidence,dt.datetime.now(dt.timezone.utc).isoformat()))
+    else:raise ValueError('Choose a new Career identity or confirm the parent save')
+    metadata={k:v for k,v in value.items() if k!='records'}
+    db.execute('INSERT INTO snapshots VALUES (?,?,?,?,?,?,?,?,?,?)',(value['sha'],career,parent,value['source'],value['club'],value['season'],value['date'],value['save_label'],evidence,json.dumps(metadata,ensure_ascii=False)))
+    primary=value['user'].get('primarycompobjid')
+    league=value['user'].get('leagueid')
+    if known_league and primary is not None and league is not None:
+        labels=db.execute("""
+            SELECT DISTINCT r.label FROM competition_rules r JOIN snapshots s
+            ON s.career=r.career AND s.club=r.club
+            WHERE r.club=? AND r.group_raw=? AND r.category='league'
+            AND json_extract(s.metadata,'$.user.primarycompobjid')=?
+            AND json_extract(s.metadata,'$.user.leagueid')=?
+            """,(value['club'],primary,primary,league)).fetchall()
+        if len(labels)==1:
+            db.execute('INSERT OR IGNORE INTO competition_rules VALUES (?,?,?,?,?,?)',
+                       (career,value['club'],primary,labels[0][0],'league',
+                        'Native club, league and primary competition match a verified rule'))
+        elif not labels:
+            native = value.get('native_league')
+            verified = LEAGUES.get((league, primary, *native)) if native else None
+            if verified:
                 db.execute('INSERT OR IGNORE INTO competition_rules VALUES (?,?,?,?,?,?)',
-                           (career,value['club'],primary,labels[0][0],'league',
-                            'Native club, league and primary competition match a verified rule'))
-            elif not labels:
-                native = value.get('native_league')
-                verified = LEAGUES.get((league, primary, *native)) if native else None
-                if verified:
-                    db.execute('INSERT OR IGNORE INTO competition_rules VALUES (?,?,?,?,?,?)',
-                               (career,value['club'],primary,verified,'league',
-                                'Native league name and IDs match the compatibility profile'))
-        for rec in value['records']:
-            db.execute('INSERT INTO player_observations VALUES (?,?,?,?,?,?,?,?,?,?,?)',(value['sha'],*[rec[k] for k in ['group_raw','player','apps','goals','assists_raw','clean_raw','gk','minutes','source_offset','raw48']]))
-        db.execute('INSERT INTO observations VALUES (?,?)',(value['sha'],value['source']))
-        siblings=db.execute('SELECT count(*) FROM snapshots WHERE parent=?',(parent,)).fetchone()[0] if parent else 0
-        return {'career':career,'sha':value['sha'],'parent':parent,'siblings_including_this':siblings,'result':'registered_explicitly','stats':len(value['records'])}
+                           (career,value['club'],primary,verified,'league',
+                            'Native league name and IDs match the compatibility profile'))
+    for rec in value['records']:
+        db.execute('INSERT INTO player_observations VALUES (?,?,?,?,?,?,?,?,?,?,?)',(value['sha'],*[rec[k] for k in ['group_raw','player','apps','goals','assists_raw','clean_raw','gk','minutes','source_offset','raw48']]))
+    db.execute('INSERT INTO observations VALUES (?,?)',(value['sha'],value['source']))
+    siblings=db.execute('SELECT count(*) FROM snapshots WHERE parent=?',(parent,)).fetchone()[0] if parent else 0
+    return {'career':career,'sha':value['sha'],'parent':parent,'siblings_including_this':siblings,'result':'registered_explicitly','stats':len(value['records'])}
+
 
 def resolve(path):
     value=inspect(path)
@@ -198,8 +275,8 @@ def withhold_ambiguous_club_assists(rows):
             row['assist_evidence'] = 'ambiguous_club_attribution'
 
 
-def history(head):
-    with connect() as db:
+def history(head, db=None):
+    with (connect() if db is None else nullcontext(db)) as db:
         chain=[];seen=set();sha=head;career=None;latest={}
         while sha:
             if sha in seen:raise ValueError('Snapshot ancestry contains a cycle')
@@ -208,12 +285,15 @@ def history(head):
             if career and career!=s['career']:raise ValueError('Snapshot ancestry crosses Career identities')
             career=s['career'];chain.append(sha)
             metadata=json.loads(s['metadata'])
+            # Older registries already retain the raw cup rows. Resolve their
+            # missing classifications with the same native catalog as new saves.
+            rules = competition_rules(db, s, metadata)
             observations=db.execute('SELECT * FROM player_observations WHERE sha=?',(sha,)).fetchall()
             assist_counts=verified_assists(observations) if metadata.get('integrity')=='crc_valid' else {}
             for r in observations:
                 key=(s['season'],s['club'],r['group_raw'],r['player'])
                 if key in latest:continue
-                rule=db.execute('SELECT * FROM competition_rules WHERE career=? AND club=? AND group_raw=?',(career,s['club'],r['group_raw'])).fetchone()
+                rule = rules.get(r['group_raw'])
                 if not rule or rule['category'] not in ('league','domestic_cup','continental'):continue
                 checks={a['field']:a['value'] for a in db.execute('SELECT * FROM field_checks WHERE sha=? AND group_raw=? AND player=?',(sha,r['group_raw'],r['player']))}
                 calibrated={a['field']:a['proof_sha'] for a in db.execute(
@@ -267,7 +347,7 @@ def certify_field(sha,group,player,field,evidence):
         s=db.execute('SELECT * FROM snapshots WHERE sha=?',(sha,)).fetchone()
         check=db.execute('SELECT * FROM field_checks WHERE sha=? AND group_raw=? AND player=? AND field=?',(sha,group,player,field)).fetchone()
         if not s or not check or check['value']<=0:raise ValueError('A positive in-game check for the exact row is required')
-        rule=db.execute('SELECT * FROM competition_rules WHERE career=? AND club=? AND group_raw=?',(s['career'],s['club'],group)).fetchone()
+        rule = competition_rules(db, s, json.loads(s['metadata'])).get(group)
         if not rule or rule['category'] not in ('league','domestic_cup','continental'):raise ValueError('Official competition is unverified')
         db.execute('INSERT OR IGNORE INTO decoder_certifications VALUES (?,?,?,?,?,?,?)',(s['career'],s['club'],group,field,sha,player,evidence))
 

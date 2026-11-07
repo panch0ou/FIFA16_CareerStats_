@@ -32,6 +32,8 @@ TABLES = {
                          ('countryid', 'WDGJ', 8), ('level', 'paPI', 3)]),
     'teams': ('lyxL', [('teamid', 'mCXg', 20)]),
     'customtable': ('ztbl', [('customvalue', 'zz02', 8)]),
+    'career_competitionprogress': ('NgwF', [('compobjid', 'OvfW', 11),
+        ('compshortname', 'GFQY', 64), ('teamid', 'mCXg', 20), ('season', 'vojK', 4)]),
 }
 CLUB = 800_321
 PLAYER = 1_200_321
@@ -47,7 +49,7 @@ def write_metadata(path, *, missing=None, bad_field=None, include_leagues=True):
         for field, short, bits in fields:
             if (table, field) == missing:
                 continue
-            field_type = 'STRING' if field == 'leaguename' else 'INTEGER'
+            field_type = 'STRING' if field in ('leaguename', 'compshortname') else 'INTEGER'
             if (table, field) == bad_field:
                 field_type = 'BINARY'
             ET.SubElement(columns, 'field', name=field, shortname=short, rangelow='0',
@@ -60,7 +62,7 @@ def binary_table(fields, rows):
     descriptors = bytearray()
     offset = 0
     for name, code, width in fields:
-        descriptors += pack('<II4sI', 0 if name == 'leaguename' else 3, offset*8,
+        descriptors += pack('<II4sI', 0 if name in ('leaguename', 'compshortname') else 3, offset*8,
                             code.encode('ascii'), width)
         offset += (width+7)//8
     header = bytearray(36)
@@ -79,16 +81,19 @@ def binary_table(fields, rows):
 
 
 def make_save(date, *, stats=False, missing_binary_field=False, include_leagues=True,
-              club=CLUB, season=1, assist_groups=None):
-    ids = list(range(PLAYER, PLAYER+8))
+              club=CLUB, season=1, assist_groups=None, goals=2, transferred=False,
+              competition_progress=(), clean_sheets=0):
+    ids = list(range(PLAYER+transferred, PLAYER+8+transferred))
+    others = [777, PLAYER] if transferred else [777]
     content = {
         'career_users': [(club, season, 13, 773)],
         'career_calendar': [(date, 20150701+(season-1)*10000, 20160630+(season-1)*10000)],
-        'teamplayerlinks': [(club, player) for player in ids] + [(20, 777)],
-        'players': [(player, 0 if player == PLAYER else 6, 87) for player in [777, *ids]],
+        'teamplayerlinks': [(club, player) for player in ids] + [(20, player) for player in others],
+        'players': [(player, 0 if player == PLAYER else 6, 87) for player in [*others, *ids]],
         'leagues': [(13, 'England Premier League (1)', 14, 1)],
         'teams': [(20,), (club,)],
         'customtable': [(42,)],
+        'career_competitionprogress': competition_progress,
     }
     directory, blocks = bytearray(), bytearray()
     for name, (code, fields) in TABLES.items():
@@ -113,8 +118,9 @@ def make_save(date, *, stats=False, missing_binary_field=False, include_leagues=
         for player, assists in zip(ids, counts, strict=True):
             row = bytearray(48)
             pack_into('<IHHH', row, 0, player, group, 90, 700)
-            row[10:12] = b'\x03\x02' if assist_groups is not None else b'\x01\x02'
+            row[10:12] = bytes((3 if assist_groups is not None else 1, goals))
             row[13] = assists
+            row[19] = clean_sheets
             save += row
     pack_into('<I', save, 132, container_crc(save))
     return bytes(save)

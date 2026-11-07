@@ -12,6 +12,7 @@ OPTIONAL = {
     'career_calendar': ('enddate',),
     'players': ('playerid', 'preferredposition1'),
     'leagues': ('leagueid', 'leaguename', 'countryid', 'level'),
+    'career_competitionprogress': ('compobjid', 'compshortname', 'teamid', 'season'),
 }
 
 
@@ -31,7 +32,7 @@ def field_metadata(table, name, optional):
             return None
         raise CareerSchemaError(f'Missing or ambiguous save field: {label}.')
     meta = fields[0].attrib
-    string = name == 'leaguename'
+    string = name in ('leaguename', 'compshortname')
     expected_type = 'DBOFIELDTYPE_STRING' if string else 'DBOFIELDTYPE_INTEGER'
     try:
         depth = int(meta['depth'])

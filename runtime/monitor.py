@@ -15,7 +15,6 @@ from datos import Source
 from transporte import Screen, Writer
 
 HERE = STATE = RESOURCE_DIR = None
-CONFIRM_COMMAND = 'Diagnostics.cmd confirm'
 
 
 def read_json(path):
@@ -111,7 +110,7 @@ def attach(pid, session_factory, observer_command):
                 if (session and session.last_flow and session.last_flow.get('result') in ('save_unresolved', 'load_unresolved')
                         and (not last_state or last_state['save'] != session.last_flow)):
                     print('Save identity is unverified. If you can confirm its origin, '
-                          f'close FIFA and run {CONFIRM_COMMAND}.', flush=True)
+                          'close FIFA and choose Import Existing Career.', flush=True)
                 last_state = state
             time.sleep(.2)
     except (OSError, json.JSONDecodeError):

@@ -15,6 +15,7 @@ from career_schema import CareerSchemaError
 import launch
 import layout
 import monitor
+from import_dialog import CareerImportDialog
 from lanzador import single_launcher
 from screen_assets import ScreenCompatibilityError
 from version import DISPLAY_VERSION
@@ -160,6 +161,9 @@ class Launcher:
         buttons.grid(row=11, columnspan=2, sticky='ew')
         self.launch_button = ttk.Button(buttons, text='Launch FIFA 16', command=lambda: self.run('play-selected', *self.selection))
         self.launch_button.pack(side='left', ipadx=14, ipady=4)
+        self.import_button = ttk.Button(buttons, text='Import Existing Career',
+                                        command=self.open_career_import)
+        self.import_button.pack(side='left', padx=8)
         ttk.Button(buttons, text='View Logs', command=self.view_logs).pack(side='right')
         self.recover_button = ttk.Button(buttons, text='Recover', command=lambda: self.run('recover-selected'))
         self.recover_button.pack(side='right', padx=8)
@@ -194,9 +198,12 @@ class Launcher:
         folder.mkdir(parents=True, exist_ok=True)
         os.startfile(folder)
 
+    def open_career_import(self):
+        CareerImportDialog(self.window, self.executor, *self.selection)
+
     def disable(self):
         for control in (self.game_combo, self.profile_combo, self.find_game, self.find_profile,
-                        self.launch_button, self.recover_button):
+                        self.launch_button, self.import_button, self.recover_button):
             control.configure(state='disabled')
 
     def refresh(self, notice=None):
@@ -232,6 +239,7 @@ class Launcher:
             self.find_profile.configure(text='Change Profile Folder' if result['profile'] else 'Locate Profile',
                                         state='normal')
             self.launch_button.configure(state='normal' if result['ready'] else 'disabled')
+            self.import_button.configure(state='normal' if result['ready'] else 'disabled')
             self.recover_button.configure(state='normal' if result['pending'] else 'disabled')
         self.window.after(80, finish)
 

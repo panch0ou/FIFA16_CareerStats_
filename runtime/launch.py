@@ -14,6 +14,7 @@ import uuid
 import bridge
 import career_schema
 import carreras
+import competition_catalog
 import datos
 import lanzador
 import layout
@@ -61,6 +62,7 @@ def configure_runtime(game, user_profile, log_dir=None):
     spec = profile()
     carreras.ACTIVE = user_profile
     carreras.SCHEMA = career_schema.load(target(game, career_schema.METADATA))
+    carreras.COMPETITIONS = competition_catalog.load(game)
     carreras.DB = layout.LOCAL / 'career.sqlite'
     carreras.LEAGUES = {(r['league'], r['primary'], r['native'], r['country'], r['level']): r['label']
                         for r in spec['compatible_leagues']}
