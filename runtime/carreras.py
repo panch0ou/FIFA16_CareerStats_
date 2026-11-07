@@ -10,7 +10,8 @@ from pathlib import Path
 
 from archivos import target
 import career_schema
-from extraer_bloque_estadistico import find_groups, longest_stride_run
+from extraer_bloque_estadistico import (ASSISTS_OFFSET, ROW_SIZE, aligned_groups,
+                                       find_groups, longest_stride_run, verified_assists)
 
 try:
     from transferengine.saveio import SaveSnapshot
@@ -95,19 +96,19 @@ def inspect(path):
     positions = {row['playerid']: row['preferredposition1'] for row in rows(s,'players',player_fields)
                  if len(row) == len(player_fields)}
     candidates=find_groups(s.data,roster,s.databases[-1][2]);records=[];groups={}
+    aligned = aligned_groups(candidates)
     for group,entries in candidates.items():
         run=longest_stride_run(entries)
-        previously_corroborated=(club==144 and group in (776,1759))
-        if run<8 and not(previously_corroborated and len(entries)>=8 and run>=4):continue
+        if run < 8 and group not in aligned:continue
         if len({player for _,player in entries})!=len(entries):raise ValueError(f'Ambiguous statistical group {group}')
         groups[group]={'count':len(entries),'stride_run':run}
         for off,pid in sorted(entries):
             actual,code,minutes,rating=struct.unpack_from('<IHHH',s.data,off)
             if (actual,code)!=(pid,group):raise ValueError('Inconsistent statistical row')
             records.append({'group_raw':group,'player':pid,'apps':s.data[off+10],'goals':s.data[off+11],
-                'assists_raw':s.data[off+13],'clean_raw':s.data[off+19],
+                'assists_raw':s.data[off+ASSISTS_OFFSET],'clean_raw':s.data[off+19],
                 'gk':int(positions[pid]==0) if pid in positions else None,'minutes':minutes,
-                'source_offset':off,'raw48':s.data[off:off+48].hex()})
+                'source_offset':off,'raw48':s.data[off:off+ROW_SIZE].hex()})
     league_fields = career_schema.OPTIONAL['leagues']
     native_leagues=[(row['leaguename'],row['countryid'],row['level'])
                     for row in rows(s,'leagues',league_fields)
@@ -179,6 +180,24 @@ def resolve(path):
             'identity':dict(row) if row else None,'status':'known_exact_hash' if row else 'unbound_do_not_merge',
             'active_game_detection':'not_automatic; source snapshot only'}
 
+def withhold_ambiguous_club_assists(rows):
+    # A native statistics row has no club ID. An observed cumulative count
+    # can follow the player, so it cannot be added across club contexts.
+    def keys(row):
+        player_season = (row['season'], row['player_id'])
+        return (player_season + (row['group_raw'],),
+                player_season + (row['category'], row['competition']))
+
+    clubs = {}
+    for row in rows:
+        for key in keys(row):
+            clubs.setdefault(key, set()).add(row['club_id'])
+    for row in rows:
+        if any(len(clubs[key]) > 1 for key in keys(row)):
+            row['assists'] = None
+            row['assist_evidence'] = 'ambiguous_club_attribution'
+
+
 def history(head):
     with connect() as db:
         chain=[];seen=set();sha=head;career=None;latest={}
@@ -188,25 +207,39 @@ def history(head):
             if not s:raise ValueError('Unknown snapshot')
             if career and career!=s['career']:raise ValueError('Snapshot ancestry crosses Career identities')
             career=s['career'];chain.append(sha)
-            for r in db.execute('SELECT * FROM player_observations WHERE sha=?',(sha,)):
+            metadata=json.loads(s['metadata'])
+            observations=db.execute('SELECT * FROM player_observations WHERE sha=?',(sha,)).fetchall()
+            assist_counts=verified_assists(observations) if metadata.get('integrity')=='crc_valid' else {}
+            for r in observations:
                 key=(s['season'],s['club'],r['group_raw'],r['player'])
                 if key in latest:continue
                 rule=db.execute('SELECT * FROM competition_rules WHERE career=? AND club=? AND group_raw=?',(career,s['club'],r['group_raw'])).fetchone()
                 if not rule or rule['category'] not in ('league','domestic_cup','continental'):continue
                 checks={a['field']:a['value'] for a in db.execute('SELECT * FROM field_checks WHERE sha=? AND group_raw=? AND player=?',(sha,r['group_raw'],r['player']))}
-                calibrated={a['field']:a['proof_sha'] for a in db.execute('SELECT * FROM decoder_certifications WHERE career=? AND club=? AND group_raw=?',(career,s['club'],r['group_raw']))}
-                assists=checks.get('assists',r['assists_raw'] if 'assists' in calibrated else None)
+                calibrated={a['field']:a['proof_sha'] for a in db.execute(
+                    "SELECT field,proof_sha FROM decoder_certifications "
+                    "WHERE career=? AND club=? AND group_raw=? AND field='clean_sheets'",
+                    (career,s['club'],r['group_raw']))}
+                assists=checks.get('assists',assist_counts.get((r['group_raw'],r['player'])))
+                if 'assists' in checks:
+                    assist_evidence='exact_row_check'
+                elif assists is not None:
+                    assist_evidence='verified_48_byte_layout'
+                else:
+                    assist_evidence='unverified_record_layout' if metadata.get('integrity')=='crc_valid' else 'unverified_save_integrity'
                 clean=checks.get('clean_sheets',r['clean_raw'] if 'clean_sheets' in calibrated else None)
-                cal=json.loads(s['metadata'])['calendar']
+                cal=metadata['calendar']
                 latest[key]={'career_id':career,'season':s['season'],'club_id':s['club'],'group_raw':r['group_raw'],
                     'club_scope':'roster_club_at_observation; transfer split not established',
                     'season_setup_date':cal['setupdate'],'season_end_date':cal.get('enddate'),
                     'competition':rule['label'],'category':rule['category'],'player_id':r['player'],'apps':r['apps'],'goals':r['goals'],
-                    'assists':assists,'clean_sheets':clean if r['gk'] else None,
+                    'assists':assists,'assist_evidence':assist_evidence,'clean_sheets':clean if r['gk'] else None,
                     'field_proof_sha256':calibrated,
                     'source_sha256':sha,'scope':'latest_observed_cumulative_not_season_complete'}
             sha=s['parent']
-        return {'career_id':career,'head':head,'ancestry':chain,'official_player_rows':list(latest.values()),
+        official=list(latest.values())
+        withhold_ambiguous_club_assists(official)
+        return {'career_id':career,'head':head,'ancestry':chain,'official_player_rows':official,
                 'club_match_records':None,'club_limit':'manager_history includes friendlies; no official club match totals established',
                 'historical_pre_2015':'separate unchanged SQLite; not merged here'}
 
@@ -228,6 +261,7 @@ def verify_field(sha,group,player,field,value,evidence):
         db.execute('INSERT OR IGNORE INTO field_checks VALUES (?,?,?,?,?,?)',(sha,group,player,field,value,evidence))
 
 def certify_field(sha,group,player,field,evidence):
+    if field != 'clean_sheets':raise ValueError('Only clean sheets use per-competition decoder certification')
     if not evidence.strip():raise ValueError('Evidence is required')
     with connect() as db:
         s=db.execute('SELECT * FROM snapshots WHERE sha=?',(sha,)).fetchone()
