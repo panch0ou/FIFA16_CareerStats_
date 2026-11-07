@@ -17,6 +17,7 @@ import layout
 import monitor
 from lanzador import single_launcher
 from screen_assets import ScreenCompatibilityError
+from version import DISPLAY_VERSION
 
 
 def log_path(action):
@@ -146,7 +147,8 @@ class Launcher:
         panel.grid(sticky='nsew')
         panel.columnconfigure(0, weight=1)
         ttk.Label(panel, text='FIFA 16 Career Stats', font=('Segoe UI', 20, 'bold')).grid(sticky='w')
-        ttk.Label(panel, text='2015/16 Career Mode', font=('Segoe UI', 10)).grid(sticky='w', pady=(0, 14))
+        ttk.Label(panel, text=f'{DISPLAY_VERSION} · 2015/16 Career Mode',
+                  font=('Segoe UI', 10)).grid(sticky='w', pady=(0, 14))
         self.game_combo, self.find_game = self.folder_row(
             panel, 2, 'Game installation', self.game, self.game_text, 'Locate FIFA 16', 0)
         self.profile_combo, self.find_profile = self.folder_row(

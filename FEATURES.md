@@ -18,6 +18,8 @@ The monitor observes native load and save events. It confirms a loaded Career on
 
 Tracking uses the selected branch and latest eligible cumulative observation for each season, roster-club context, competition and player. It does not add repeated snapshots together. The developer diagnostics retain manual registration for an eligible unregistered save whose origin can be verified.
 
-Automatic competition rules cover the exact verified native tuples for the Premier League and Championship. Additional groups and Career Mode assists or clean sheets require separate evidence. Clean sheets apply to verified goalkeepers. Friendlies and unclassified groups are excluded. The project reads saves and stores its own observations in SQLite. Unsaved progress, complete club match totals, transfer-by-transfer splits and statistics from unobserved leagues remain outside the verified scope.
+Automatic competition rules cover the verified native tuples for the Premier League and Championship. Other groups need their own competition evidence. Once a row belongs to a classified official competition, its assists can be read from the validated 48-byte layout without a per-Career or per-club certification. A validated zero displays as 0. An unverified layout or ambiguous same-season club attribution displays as a dash.
+
+Clean sheets still require evidence and a verified goalkeeper position. Friendlies and unclassified groups are excluded. The project reads saves and stores its own observations in SQLite. Unsaved progress, complete club match totals, transfer-by-transfer splits and statistics from unobserved leagues remain outside the verified scope.
 
 Modified squads can be tracked if their saves retain the required tables, fields, and native event and statistics formats. A save that fails structure or checksum checks is rejected by the tracker. See [ARCHITECTURE.md](ARCHITECTURE.md) for the field contract.
